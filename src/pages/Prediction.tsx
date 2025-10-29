@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Upload, Download, Play } from "lucide-react";
+import { Upload, Download, Play, TrendingUp, Award, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Prediction = () => {
@@ -66,8 +66,13 @@ const Prediction = () => {
     low: predictions.filter(p => p.prediction === "Low").length,
   };
 
+  const topPerformers = predictions
+    .filter(p => p.prediction === "High")
+    .sort((a, b) => b.confidence - a.confidence)
+    .slice(0, 5);
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <div>
         <h2 className="text-3xl font-bold text-foreground mb-2">Model Prediction</h2>
         <p className="text-muted-foreground">
@@ -112,30 +117,85 @@ const Prediction = () => {
       {/* Results */}
       {predictions.length > 0 && (
         <>
-          {/* Stats */}
+          {/* Stats with Flashy Charts */}
           <div className="grid md:grid-cols-3 gap-4">
-            <Card className="p-4 bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20">
-              <p className="text-sm text-muted-foreground mb-1">High Performance</p>
-              <p className="text-3xl font-bold text-foreground">{performanceStats.high}</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {((performanceStats.high / predictions.length) * 100).toFixed(1)}% of total
-              </p>
+            <Card className="p-6 bg-gradient-to-br from-green-500 to-emerald-600 text-white overflow-hidden relative animate-scale-in hover:scale-105 transition-all">
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm text-white/80 font-medium">High Performance</p>
+                  <TrendingUp className="h-5 w-5 animate-pulse" />
+                </div>
+                <p className="text-4xl font-bold mb-2">{performanceStats.high}</p>
+                <p className="text-xs text-white/80">
+                  {((performanceStats.high / predictions.length) * 100).toFixed(1)}% of total districts
+                </p>
+              </div>
+              <div className="absolute -right-4 -bottom-4 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
             </Card>
-            <Card className="p-4 bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 border-yellow-500/20">
-              <p className="text-sm text-muted-foreground mb-1">Medium Performance</p>
-              <p className="text-3xl font-bold text-foreground">{performanceStats.medium}</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {((performanceStats.medium / predictions.length) * 100).toFixed(1)}% of total
-              </p>
+            
+            <Card className="p-6 bg-gradient-to-br from-yellow-500 to-orange-500 text-white overflow-hidden relative animate-scale-in hover:scale-105 transition-all" style={{ animationDelay: "100ms" }}>
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm text-white/80 font-medium">Medium Performance</p>
+                  <Zap className="h-5 w-5 animate-pulse" />
+                </div>
+                <p className="text-4xl font-bold mb-2">{performanceStats.medium}</p>
+                <p className="text-xs text-white/80">
+                  {((performanceStats.medium / predictions.length) * 100).toFixed(1)}% of total districts
+                </p>
+              </div>
+              <div className="absolute -right-4 -bottom-4 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
             </Card>
-            <Card className="p-4 bg-gradient-to-br from-red-500/10 to-red-500/5 border-red-500/20">
-              <p className="text-sm text-muted-foreground mb-1">Low Performance</p>
-              <p className="text-3xl font-bold text-foreground">{performanceStats.low}</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {((performanceStats.low / predictions.length) * 100).toFixed(1)}% of total
-              </p>
+            
+            <Card className="p-6 bg-gradient-to-br from-red-500 to-rose-600 text-white overflow-hidden relative animate-scale-in hover:scale-105 transition-all" style={{ animationDelay: "200ms" }}>
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm text-white/80 font-medium">Low Performance</p>
+                  <Award className="h-5 w-5 animate-pulse" />
+                </div>
+                <p className="text-4xl font-bold mb-2">{performanceStats.low}</p>
+                <p className="text-xs text-white/80">
+                  {((performanceStats.low / predictions.length) * 100).toFixed(1)}% of total districts
+                </p>
+              </div>
+              <div className="absolute -right-4 -bottom-4 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
             </Card>
           </div>
+
+          {/* Top Performers */}
+          {topPerformers.length > 0 && (
+            <Card className="p-6 bg-gradient-to-br from-primary/10 via-card to-accent/10 border-primary/20 animate-slide-up">
+              <div className="flex items-center gap-3 mb-6">
+                <Award className="h-6 w-6 text-primary" />
+                <div>
+                  <h3 className="text-xl font-semibold text-foreground">Top Performing Districts</h3>
+                  <p className="text-sm text-muted-foreground">Highest confidence predictions</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                {topPerformers.map((district, i) => (
+                  <div 
+                    key={i} 
+                    className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-primary/5 to-transparent hover:from-primary/10 transition-all group"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center font-bold text-white text-lg group-hover:scale-110 transition-transform">
+                      #{i + 1}
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-foreground">{district.district}</h4>
+                      <p className="text-xs text-muted-foreground">
+                        Density: {district.msme_density} | Ratio: {district.micro_ratio}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-semibold text-green-600 mb-1">{district.prediction}</div>
+                      <div className="text-xs text-muted-foreground">{(district.confidence * 100).toFixed(1)}% confidence</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
 
           {/* Predictions Table */}
           <Card className="p-6">
